@@ -92,7 +92,7 @@ public class SorterController {
                 catch(Exception e) {
                     continue;
                 }
-                Thread.sleep(300);
+                Thread.sleep(1000);
             }
         }
 
