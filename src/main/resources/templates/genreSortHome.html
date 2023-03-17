@@ -1,0 +1,48 @@
+<form th:action="@{/home}" method="get">
+    <button type="submit" id="homeButton">Home</button>
+</form>
+<form th:action="@{/genre-sort}" th:object="${playlistSortRequest}" method="get">
+    <h2 style="color:red">Destination playlist - Required</h2>
+    <input th:value="${playlistSortRequest?.playlistUrlDestination}" type="text" style="width:600px" id="playlistUrlDestination" name="playlistUrlDestination" placeholder="Destination playlist url"/>
+    <br><br><hr>
+    <h2>Source(s) of songs</h2>
+    <textarea style="height: 50px;width:600px;resize:none;" id="playlistUrlSource" name="playlistUrlSource"
+              th:inline="text" placeholder="Source playlist urls, enter each on new line"/>[[${playlistSortRequest?.playlistUrlSource}]]</textarea>
+    <br><br>
+    <input th:value="${playlistSortRequest?.userPlaylistSource}" type="text" style="width:600px" id="userPlaylistSource" name="userPlaylistSource" placeholder="Add all playlists created by this user profile, input their profile url"/>
+    <br><br>
+    <input type="checkbox" name="addPlaylistsFromCurrentUser"  th:checked="${playlistSortRequest?.addPlaylistsFromCurrentUserBoolean}">
+    <label for="addPlaylistsFromCurrentUser"> Add all of the playlists you created to the source playlists.</label><br><br>
+    <input th:value="${playlistSortRequest?.addLikedSongsFromCurrentUser}" type="checkbox" name="addLikedSongsFromCurrentUser" th:checked="${playlistSortRequest?.addLikedSongsFromCurrentUserBoolean}">
+    <label for="addLikedSongsFromCurrentUser"> Add all of the songs from your liked list.</label><br><br>
+    <hr>
+    <h2>Song genres/artists to add to destination playlist</h2>
+    <h3>Genres - These are comma separated lists.</h3>
+    <input th:value="${playlistSortRequest?.genres}" type="text" style="width:300px;" id="genres" name="genres" placeholder="Genre contains"/>
+    <input th:value="${playlistSortRequest?.genresExactMatch}" type="text" style="width:300px;" id="genresExactMatch" name="genresExactMatch" placeholder="Genre exact match"/><br>
+    <input th:value="${playlistSortRequest?.genresExactExclude}" type="text" style="width:300px;" id="genresExactExclude" name="genresExactExclude" placeholder="Exact genre names to exclude"/>
+    <a href="http://localhost:8080/artist-search-home" target="_blank">Open artist genre/id search in new tab</a>
+    <br><span>NOTE: Exact genres excluded field is used to filter out genres when using the genre contains field, if a
+    song is linked to an exact genre included in the above genre exact match field, it will be added.</span>
+    <br><br>
+    <input th:value="${playlistSortRequest?.addGenreFilterFromGenreInfo}" type="checkbox" name="addGenreFilterFromGenreInfo" th:checked="${playlistSortRequest?.addGenreFilterFromGenreInfoBoolean}">
+    <label for="addGenreFilterFromGenreInfo"> Add genre information from playlist description if available.</label><br>
+    <h3>Artists - Songs by these artists are included in addition to above genres</h3>
+    <textarea style="height: 50px;width:300px;resize:none;" id="artistIdToIncludeSongsBy" name="artistIdToIncludeSongsBy"
+              th:inline="text" placeholder="Artist Ids, enter each on new line"/>[[${playlistSortRequest?.artistIdToIncludeSongsBy}]]</textarea>
+    <a href="http://localhost:8080/artist-search-home" target="_blank">Open artist genre/id search in new tab</a>
+    <br><br><hr>
+    <h2>Additional options</h2>
+    <input type="checkbox" name="duplicatesAllowed" th:checked="${playlistSortRequest?.duplicatesAllowedBoolean}">
+    <label for="duplicatesAllowed"> Allow duplicate songs to be added</label><br><br>
+    <br><br><hr>
+    <br>
+    <button style="font-size: 24px; background-color: #1DB954;" type="submit" id="startButton" onClick="myFunction()">Sort playlist</button>
+    <H1 id="demo"></H1>
+    <script>
+        function myFunction() {
+            document.getElementById("demo").innerHTML = "In Progress";
+            document.getElementById("startButton").style.display = "none";
+        }
+    </script>
+</form>

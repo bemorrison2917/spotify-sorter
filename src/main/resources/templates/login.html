@@ -1,0 +1,5 @@
+<h2>Hello please login with spotify</h2>
+<form th:action="@{/authenticate}" method="get">
+    <input type="hidden" name="redirectPath" value="home" />
+    <button type="submit" id="loginButton">Spotify Login</button>
+</form>

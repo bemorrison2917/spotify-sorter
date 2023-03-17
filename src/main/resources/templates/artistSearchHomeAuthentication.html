@@ -1,0 +1,5 @@
+<h2>Authentication needed</h2>
+<form th:action="@{/authenticate}" method="get">
+    <input type="hidden" name="redirectPath" value="artist-search-home" />
+    <button type="submit" id="loginButton">Spotify Login</button>
+</form>

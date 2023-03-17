@@ -1,0 +1,21 @@
+<p>Please enter a valid destination playlist url. </p>
+<form th:action="@{/genre-sort-home}" th:object="${playlistSortRequest}" method="get">
+    <input type="text" th:value="*{playlistUrlSource}" th:field="*{playlistUrlSource}" hidden/>
+    <input type="text" th:value="*{genres}" th:field="*{genres}" hidden/>
+    <input type="text" th:value="*{playlistUrlDestination}" th:field="*{playlistUrlDestination}" hidden/>
+    <input type="text" th:value="*{genresExactMatch}" th:field="*{genresExactMatch}" hidden/>
+    <input type="text" th:value="*{genresExactExclude}" th:field="*{genresExactExclude}" hidden/>
+    <input type="text" th:value="*{userPlaylistSource}" th:field="*{userPlaylistSource}" hidden/>
+    <input type="text" th:value="*{addLikedSongsFromCurrentUser}" th:field="*{addLikedSongsFromCurrentUser}" hidden/>
+    <input type="text" th:value="*{artistIdToIncludeSongsBy}" th:field="*{artistIdToIncludeSongsBy}" hidden/>
+    <input type="text" th:value="*{duplicatesAllowed}" th:field="*{duplicatesAllowed}" hidden/>
+    <input type="text" th:value="*{addGenreInformation}" th:field="*{addGenreInformation}" hidden/>
+    <input type="text" th:value="*{addGenreFilterFromGenreInfo}" th:field="*{addGenreFilterFromGenreInfo}" hidden/>
+    <input type="text" th:value="*{addPlaylistsFromCurrentUser}" th:field="*{addPlaylistsFromCurrentUser}" hidden/>
+
+    <input type="text" th:value="*{duplicatesAllowedBoolean}" th:field="*{duplicatesAllowedBoolean}" hidden/>
+    <input type="text" th:value="*{addPlaylistsFromCurrentUserBoolean}" th:field="*{addPlaylistsFromCurrentUserBoolean}" hidden/>
+    <input type="text" th:value="*{addLikedSongsFromCurrentUserBoolean}" th:field="*{addLikedSongsFromCurrentUserBoolean}" hidden/>
+    <input type="text" th:value="*{addGenreFilterFromGenreInfoBoolean}" th:field="*{addGenreFilterFromGenreInfoBoolean}" hidden/>
+    <button type="submit" id="tryAgain">Try Again</button>
+</form>
