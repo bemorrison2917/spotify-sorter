@@ -2,7 +2,6 @@ package com.basil.spotify.sorter.controller;
 
 import com.basil.spotify.sorter.models.*;
 import com.basil.spotify.sorter.client.SpotifyClient;
-import com.basil.spotify.sorter.util.Wait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
@@ -21,7 +20,18 @@ public class SorterController {
     @GetMapping("/sort")
     public void sort(@ModelAttribute("playlistSortRequest") PlaylistSortRequest playlistSortRequest) throws InterruptedException {
         String playlistIdSource = playlistSortRequest.getPlaylistIdSource();
-        List<String> genres = Arrays.stream(playlistSortRequest.getGenres().split(",")).toList();
+        List<String> genres;
+        if(playlistSortRequest.getGenres() == null || playlistSortRequest.getGenres().isEmpty()) {
+            genres = null;
+        }
+        else {
+            genres = Arrays.stream(playlistSortRequest.getGenres().split(",")).toList();
+        }
+        System.out.println(genres);
+        List<String> genresExactMatch = Arrays.stream(playlistSortRequest.getGenresExactMatch().split(",")).toList();
+        List<String> genresExactExclude = Arrays.stream(playlistSortRequest.getGenresExactExclude().split(",")).toList();
+        System.out.println(genresExactMatch);
+        System.out.println("test");
 
         playlistIdDestination = playlistSortRequest.getPlaylistIdDestination();
         trackUris = new ArrayList<>();
@@ -41,7 +51,7 @@ public class SorterController {
                 throw e;
             }
             List<Item> items = playlistTracksResponse.getItems();
-            getMatchingGenreTrackUrisAddToPlaylistAt100(items, genres);
+            getMatchingGenreTrackUrisAddToPlaylistAt100(items, genres, genresExactMatch, genresExactExclude);
 
         }
         if(trackUris.size() > 0) {
@@ -49,7 +59,7 @@ public class SorterController {
         }
     }
 
-    private void getMatchingGenreTrackUrisAddToPlaylistAt100(List<Item> items, List<String> genres) {
+    private void getMatchingGenreTrackUrisAddToPlaylistAt100(List<Item> items, List<String> genres, List<String> genresExactMatch, List<String> genresExactExclude) {
         ArtistsResponse artistsResponse = null;
         Set<String> artistsList = new HashSet<>();
         for(Item item: items) {
@@ -105,14 +115,43 @@ public class SorterController {
         ////////////////////////////////////////////////////////////////////////////////
         for(Item item: items) {
             try {
-                for(String genre: genres) {
-                    if (artistGenreMap.get(item.getTrack().getArtists().get(0).getId()).contains(genre)) {
-                        trackUris.add(item.getTrack().getUri());
-                        if(trackUris.size() == 100) {
-                            addTracksToDestinationPlaylist();
-                            trackUris = new ArrayList<>();
+                boolean hasGenre = false;
+                List<String> artistGenres = artistGenreMap.get(item.getTrack().getArtists().get(0).getId());
+
+                if(genres != null) {
+                    for (String genre : genres) {
+                        if(genre.isEmpty()) {
+                            break;
                         }
-                        break;
+                        for (String artistGenre : artistGenres) {
+                            if(genresExactExclude.contains(artistGenre)) {
+                                break;
+                            }
+                            if (artistGenre.contains(genre)) {
+                                hasGenre = true;
+                                break;
+                            }
+                        }
+                        if (hasGenre) {
+                            trackUris.add(item.getTrack().getUri());
+                            if (trackUris.size() == 100) {
+                                addTracksToDestinationPlaylist();
+                                trackUris = new ArrayList<>();
+                            }
+                            break;
+                        }
+                    }
+                }
+                if(hasGenre == false && genresExactMatch != null) {
+                    for(String genre: genresExactMatch) {
+                        if(artistGenres.contains(genre)) {
+                            trackUris.add(item.getTrack().getUri());
+                            if(trackUris.size() == 100) {
+                                addTracksToDestinationPlaylist();
+                                trackUris = new ArrayList<>();
+                            }
+                            break;
+                        }
                     }
                 }
             }
