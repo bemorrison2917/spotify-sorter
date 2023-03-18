@@ -1,0 +1,6 @@
+<form th:action="@{/sort}" th:object="${someBean}" method="get">
+    <input type="text" id="playlistIdSource" name="playlistIdSource" placeholder="Source playlist id"/>
+    <input type="text" id="genres" name="genres" placeholder="Comma separated genres"/>
+    <input type="text" id="playlistIdDestination" name="Destination playlist id" placeholder="Destination playlist id"/>
+    <button type="submit">Start</button>
+</form>
