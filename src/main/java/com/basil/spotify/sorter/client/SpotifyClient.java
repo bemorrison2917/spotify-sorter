@@ -1,5 +1,6 @@
-package com.basil.spotify.sorter.service;
+package com.basil.spotify.sorter.client;
 
+import com.basil.spotify.sorter.util.Wait;
 import org.slf4j.Logger;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -40,7 +41,7 @@ private String accessToken;
            catch(HttpClientErrorException.TooManyRequests e) {
                int retryAfter = Integer.parseInt(e.getResponseHeaders().get(HttpHeaders.RETRY_AFTER).get(0));
                System.out.println("Too many requests, waiting back up period then trying again");
-               Thread.sleep(1000 * retryAfter);
+               Wait.waitInMillis(1000 * retryAfter);
            }
 
        }
@@ -65,7 +66,7 @@ private String accessToken;
             catch(HttpClientErrorException.TooManyRequests e) {
                 int retryAfter = Integer.parseInt(e.getResponseHeaders().get(HttpHeaders.RETRY_AFTER).get(0));
                 System.out.println("Too many requests, waiting back up period then trying again");
-                Thread.sleep(1000 * retryAfter);
+                Wait.waitInMillis(1000 * retryAfter);
             }
             retry = false;
         }
