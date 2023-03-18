@@ -44,52 +44,108 @@ public class SorterController {
             getMatchingGenreTrackUrisAddToPlaylistAt100(items, genres);
 
         }
-        addTracksToDestinationPlaylist();
+        if(trackUris.size() > 0) {
+            addTracksToDestinationPlaylist();
+        }
     }
 
     private void getMatchingGenreTrackUrisAddToPlaylistAt100(List<Item> items, List<String> genres) {
-        ArtistResponse artistResponse = null;
-        List<String> trackUris = new ArrayList<>();
+        ArtistsResponse artistsResponse = null;
+        Set<String> artistsList = new HashSet<>();
         for(Item item: items) {
+            if(item.getTrack() == null) {
+                continue;
+            }
             String artistId = item.getTrack().getArtists().get(0).getId();
             List<String> artistGenres = artistGenreMap.get(artistId);
-            if(artistGenres == null) {
+            if (artistGenres == null) {
                 try {
-                    artistResponse = spotifyClient.get("https://api.spotify.com/v1/artists/" + artistId, ArtistResponse.class);
-                    artistGenres = artistResponse.getGenres();
-                    artistGenreMap.put(artistId, artistGenres);
+                    if(!artistId.isBlank() && artistId != null) {
+                        artistsList.add(artistId);
+                    }
+                    if(artistsList.size() == 50) {
+                        ///////////////////////////////////////////////////////////////////////////////
+
+                        try {
+                            artistsResponse = spotifyClient.get("https://api.spotify.com/v1/artists?ids=" + generateArtistList(artistsList),
+                                    ArtistsResponse.class);
+                        }
+                        catch(Exception e) {
+                            System.out.println("ERROR");
+                            continue;
+                        }
+                        for(Artist artist: artistsResponse.getArtists()) {
+                            artistGenreMap.put(artist.getId(), artist.getGenres());
+                        }
+                        //////////////////////////////////////////////////////////////////////////////////
+                        artistsList = new HashSet<>();
+                    }
+
                 } catch (Exception e) {
                     continue;
                 }
             }
+        }
+        /////////////////////////////////////////////////////////////////////////////
+        if(artistsList.size() > 0) {
+            //System.out.println(generateJsonWithSingleList(artistsList, "ids"));
+            try {
+                artistsResponse = spotifyClient.get("https://api.spotify.com/v1/artists?ids=" + generateArtistList(artistsList),
+                        ArtistsResponse.class);
+
+
+                for (Artist artist : artistsResponse.getArtists()) {
+                    artistGenreMap.put(artist.getId(), artist.getGenres());
+                }
+            }
+             catch(Exception e) {
+                 System.out.println("ERROR");
+            }
+        }
+        ////////////////////////////////////////////////////////////////////////////////
+        for(Item item: items) {
             try {
                 for(String genre: genres) {
-                    if (artistResponse.getGenres().contains(genre)) {
+                    if (artistGenreMap.get(item.getTrack().getArtists().get(0).getId()).contains(genre)) {
                         trackUris.add(item.getTrack().getUri());
                         if(trackUris.size() == 100) {
                             addTracksToDestinationPlaylist();
                             trackUris = new ArrayList<>();
                         }
-                        continue;
+                        break;
                     }
                 }
-
             }
             catch(Exception e) {
                 continue;
             }
-            Wait.waitInMillis(350);
+            //Wait.waitInMillis(350);
         }
     }
 
-    private void addTracksToDestinationPlaylist() throws InterruptedException {
-        System.out.println(trackUris.size());
-        //spotifyClient.post("https://api.spotify.com/v1/playlists/" + playlistIdDestination + "/tracks",
-           //     null, generateUrisJson(trackUris));
+    private String generateArtistList(Set<String> artistList) {
+        String artistString = "";
+        Iterator artistIter = artistList.iterator();
+        while(artistIter.hasNext()) {
+            artistString += artistIter.next();
+            if(artistIter.hasNext()) {
+                artistString += ",";
+            }
+
+        }
+        System.out.println(artistString);
+        return artistString;
     }
 
-    private String generateUrisJson(List<String> uris) {
-        String json = "{\"uris\":[";
+    private void addTracksToDestinationPlaylist() throws InterruptedException {
+        //System.out.println(trackUris.size());
+        //System.out.println(generateJsonWithSingleList(trackUris, "uris"));
+        spotifyClient.post("https://api.spotify.com/v1/playlists/" + playlistIdDestination + "/tracks",
+                null, generateJsonWithSingleList(trackUris, "uris"));
+    }
+
+    private String generateJsonWithSingleList(List<String> uris, String fieldName) {
+        String json = "{\"" + fieldName + "\":[";
         Iterator<String> urisIter = uris.iterator();
         while(urisIter.hasNext()) {
             json += "\""+ urisIter.next()+"\"";

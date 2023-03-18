@@ -41,10 +41,38 @@ private String accessToken;
            catch(HttpClientErrorException.TooManyRequests e) {
                int retryAfter = Integer.parseInt(e.getResponseHeaders().get(HttpHeaders.RETRY_AFTER).get(0));
                System.out.println("Too many requests, waiting back up period then trying again");
+               System.out.println(retryAfter);
                Wait.waitInMillis(1000 * retryAfter);
            }
 
        }
+        return test.getBody();
+    }
+
+    public <T> T get(String uri, Class<T> responseClass, String requestBody) throws HttpClientErrorException {
+        boolean retry = true;
+        ResponseEntity<T> test = null;
+        while(retry) {
+            try {
+                ResponseEntity<T> response = null;
+                RestTemplate restTemplate = new RestTemplate();
+                HttpHeaders headers = new HttpHeaders();
+
+                headers.set("Authorization", "Bearer " + accessToken); //accessToken can be the secret key you generate.
+                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+                HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+
+                test = restTemplate.exchange(uri, HttpMethod.GET, entity, responseClass);
+                retry = false;
+            }
+            catch(HttpClientErrorException.TooManyRequests e) {
+                int retryAfter = Integer.parseInt(e.getResponseHeaders().get(HttpHeaders.RETRY_AFTER).get(0));
+                System.out.println("Too many requests, waiting back up period then trying again");
+                System.out.println(retryAfter);
+                Wait.waitInMillis(1000 * retryAfter);
+            }
+
+        }
         return test.getBody();
     }
 
@@ -60,12 +88,13 @@ private String accessToken;
                 headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
                 HttpEntity<?> entity = new HttpEntity<>(requestBody, headers);
 
-                restTemplate.exchange(uri, HttpMethod.POST, entity, responseClass);
-                System.out.println(test.getStatusCode());
+                test = restTemplate.exchange(uri, HttpMethod.POST, entity, responseClass);
+
             }
             catch(HttpClientErrorException.TooManyRequests e) {
                 int retryAfter = Integer.parseInt(e.getResponseHeaders().get(HttpHeaders.RETRY_AFTER).get(0));
                 System.out.println("Too many requests, waiting back up period then trying again");
+                System.out.println(retryAfter);
                 Wait.waitInMillis(1000 * retryAfter);
             }
             retry = false;
