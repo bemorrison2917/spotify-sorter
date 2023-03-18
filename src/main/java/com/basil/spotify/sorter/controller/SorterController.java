@@ -36,20 +36,20 @@ public class SorterController {
         System.out.println(genres);
         System.out.println(playlistIdSource);
         System.out.println(playlistIdDestination);
+        List<String> trackUris = new ArrayList<>();
+
 
         PlaylistTracksResponse playlistTracksResponse = spotifyClient.get("https://api.spotify.com/v1/playlists/" + playlistIdSource + "/tracks", PlaylistTracksResponse.class);
         System.out.println(spotifyClient.get("https://api.spotify.com/v1/playlists/" + playlistIdSource + "/tracks", String.class));
         int total = playlistTracksResponse.getTotal();
-        System.out.println(total/100);
-//total/100
+
         Map<String, List<String>> artistGenreMap = new HashMap<>();
         ArtistResponse artistResponse = null;
-        System.out.println(Math.ceil(total/100));
-        List<String> trackUris = new ArrayList<>();
         for(int i = 0; i < Math.ceil(total/100) + 1; i++) {
             if(trackUris.size() == 100) {
                 spotifyClient.post("https://api.spotify.com/v1/playlists/" + playlistIdDestination + "/tracks",
-                        null, trackUris);
+                        null, generateUrisJson(trackUris));
+                trackUris = new ArrayList<>();
             }
             System.out.println("i:" + i);
             try {
@@ -78,7 +78,6 @@ public class SorterController {
                     for(String genre: genres) {
                         if (artistResponse.getGenres().contains(genre)) {
                             System.out.println("HIT");
-                            String trackUri = item.getTrack().getUri();
                             trackUris.add(item.getTrack().getUri());
 //                            spotifyClient.post("https://api.spotify.com/v1/playlists/" + playlistIdDestination + "/tracks?uris=" + trackUri,
 //                                    null);
@@ -95,9 +94,23 @@ public class SorterController {
             }
         }
         spotifyClient.post("https://api.spotify.com/v1/playlists/" + playlistIdDestination + "/tracks",
-                null, trackUris);
+                null, generateUrisJson(trackUris));
+    }
 
-
+    private String generateUrisJson(List<String> uris) {
+        String json = "{\"uris\":[";
+        Iterator<String> urisIter = uris.iterator();
+        while(urisIter.hasNext()) {
+            json += "\""+ urisIter.next()+"\"";
+            if(!urisIter.hasNext()) {
+                json += "]}";
+            }
+            else {
+                json+=",";
+            }
+        }
+        System.out.println(json);
+        return json;
     }
 
 }
