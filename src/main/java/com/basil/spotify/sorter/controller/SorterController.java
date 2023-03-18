@@ -90,7 +90,7 @@ public class SorterController {
                 catch(Exception e) {
                     continue;
                 }
-                Thread.sleep(1000);
+                Thread.sleep(350);
             }
         }
         spotifyClient.post("https://api.spotify.com/v1/playlists/" + playlistIdDestination + "/tracks",
