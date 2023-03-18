@@ -2,5 +2,12 @@
     <input type="text" id="playlistIdSource" name="playlistIdSource" placeholder="Source playlist id"/>
     <input type="text" id="genres" name="genres" placeholder="Comma separated genres"/>
     <input type="text" id="playlistIdDestination" name="playlistIdDestination" placeholder="Destination playlist id"/>
-    <button type="submit">Start</button>
+    <button type="submit" id="startButton" onClick="myFunction()">Start</button>
+    <H1 id="demo"></H1>
+    <script>
+        function myFunction() {
+            document.getElementById("demo").innerHTML = "In Progress";
+            document.getElementById("startButton").style.display = "none";
+        }
+    </script>
 </form>
