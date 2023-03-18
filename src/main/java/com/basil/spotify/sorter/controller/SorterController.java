@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @RestController
 public class SorterController {
@@ -45,9 +42,15 @@ public class SorterController {
         int total = playlistTracksResponse.getTotal();
         System.out.println(total/100);
 //total/100
-        ArtistResponse artistResponse;
+        Map<String, List<String>> artistGenreMap = new HashMap<>();
+        ArtistResponse artistResponse = null;
         System.out.println(Math.ceil(total/100));
+        List<String> trackUris = new ArrayList<>();
         for(int i = 0; i < Math.ceil(total/100) + 1; i++) {
+            if(trackUris.size() == 100) {
+                spotifyClient.post("https://api.spotify.com/v1/playlists/" + playlistIdDestination + "/tracks",
+                        null, trackUris);
+            }
             System.out.println("i:" + i);
             try {
                 playlistTracksResponse = spotifyClient.get("https://api.spotify.com/v1/playlists/" +
@@ -60,19 +63,25 @@ public class SorterController {
             List<String> trackIds = new ArrayList<>();
             for(Item item: items) {
                 String artistId = item.getTrack().getArtists().get(0).getId();
-                try {
-                    artistResponse = spotifyClient.get("https://api.spotify.com/v1/artists/" + artistId, ArtistResponse.class);
-                }catch(Exception e) {
-                    continue;
+                List<String> artistGenres = artistGenreMap.get(artistId);
+                if(artistGenres == null) {
+                    try {
+                        artistResponse = spotifyClient.get("https://api.spotify.com/v1/artists/" + artistId, ArtistResponse.class);
+                        artistGenres = artistResponse.getGenres();
+                        artistGenreMap.put(artistId, artistGenres);
+                    } catch (Exception e) {
+                        continue;
+                    }
+                    System.out.println(artistResponse.getGenres());
                 }
-                System.out.println(artistResponse.getGenres());
                 try {
                     for(String genre: genres) {
                         if (artistResponse.getGenres().contains(genre)) {
                             System.out.println("HIT");
                             String trackUri = item.getTrack().getUri();
-                            spotifyClient.post("https://api.spotify.com/v1/playlists/" + playlistIdDestination + "/tracks?uris=" + trackUri,
-                                    null);
+                            trackUris.add(item.getTrack().getUri());
+//                            spotifyClient.post("https://api.spotify.com/v1/playlists/" + playlistIdDestination + "/tracks?uris=" + trackUri,
+//                                    null);
 
                             continue;
                         }
@@ -85,6 +94,8 @@ public class SorterController {
                 Thread.sleep(1000);
             }
         }
+        spotifyClient.post("https://api.spotify.com/v1/playlists/" + playlistIdDestination + "/tracks",
+                null, trackUris);
 
 
     }
