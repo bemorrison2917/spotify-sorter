@@ -4,11 +4,13 @@ import com.basil.spotify.sorter.client.SpotifyClient;
 import com.basil.spotify.sorter.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.*;
 
-@Component
+//TODO clean this shit up
+@Service
 public class SortService {
     @Autowired
     private SpotifyClient spotifyClient;
