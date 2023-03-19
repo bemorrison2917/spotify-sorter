@@ -22,7 +22,7 @@ private String accessToken;
         this.accessToken = accessToken;
     }
 
-    public <T> T get(String uri, Class<T> responseClass) throws HttpClientErrorException, InterruptedException {
+    public <T> T get(String uri, Class<T> responseClass) throws HttpClientErrorException {
       boolean retry = true;
         ResponseEntity<T> test = null;
         while(retry) {
@@ -76,7 +76,7 @@ private String accessToken;
         return test.getBody();
     }
 
-    public <T> T post(String uri, Class<T> responseClass, String requestBody) throws HttpClientErrorException, InterruptedException {
+    public <T> T post(String uri, Class<T> responseClass, String requestBody) throws HttpClientErrorException {
         boolean retry = true;
         ResponseEntity<T> test = null;
         while(retry) {
