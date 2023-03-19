@@ -1,0 +1,13 @@
+<form th:action="@{/home}" method="get">
+    <button type="submit" id="homeButton">Home</button>
+</form>
+<form th:action="@{/artist-search-home}" method="get">
+    <button type="submit" id="searchButton">Search another artist</button>
+</form>
+<h1>Results</h1>
+<tr th:each="artistGenre:${artistGenres}">
+    <td th:text="${artistGenre.name}">Name</td>
+    <td> - </td>
+    <td th:text="${artistGenre.genres}">Genres</td>
+    <br>
+</tr>

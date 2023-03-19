@@ -3,9 +3,7 @@ package com.basil.spotify.sorter.service;
 import com.basil.spotify.sorter.client.SpotifyClient;
 import com.basil.spotify.sorter.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.*;
 
@@ -20,7 +18,7 @@ public class SortService {
     List<String> trackUris;
 
     public void sort(PlaylistSortRequest playlistSortRequest) {
-        String playlistIdSource = playlistSortRequest.getPlaylistIdSource();
+        String playlistIdSource = parseIdFromPlaylistUrl(playlistSortRequest.getPlaylistUrlSource());
         List<String> genres;
         if(playlistSortRequest.getGenres() == null || playlistSortRequest.getGenres().isEmpty()) {
             genres = null;
@@ -34,7 +32,7 @@ public class SortService {
         System.out.println(genresExactMatch);
         System.out.println("test");
 
-        playlistIdDestination = playlistSortRequest.getPlaylistIdDestination();
+        playlistIdDestination = parseIdFromPlaylistUrl(playlistSortRequest.getPlaylistUrlDestination());
         trackUris = new ArrayList<>();
 
 
@@ -44,13 +42,10 @@ public class SortService {
 
         for(int i = 0; i < Math.ceil(total/100.0) + 1; i++) {
 
-            try {
+
                 playlistTracksResponse = spotifyClient.get("https://api.spotify.com/v1/playlists/" +
                         playlistIdSource + "/tracks?limit=100&offset=" + (i * 100), PlaylistTracksResponse.class);
-            }
-            catch(HttpClientErrorException e) {
-                throw e;
-            }
+
             List<Item> items = playlistTracksResponse.getItems();
             getMatchingGenreTrackUrisAddToPlaylistAt50(items, genres, genresExactMatch, genresExactExclude);
 
@@ -58,6 +53,11 @@ public class SortService {
         if(trackUris.size() > 0) {
             addTracksToDestinationPlaylist();
         }
+    }
+
+    private String parseIdFromPlaylistUrl(String playlistUrl) {
+        System.out.println(playlistUrl.substring(playlistUrl.indexOf("playlist/") + 9, playlistUrl.indexOf("?si=")));
+        return playlistUrl.substring(playlistUrl.indexOf("playlist/") + 9, playlistUrl.indexOf("?si="));
     }
 
     private void getMatchingGenreTrackUrisAddToPlaylistAt50(List<Item> items, List<String> genres, List<String> genresExactMatch, List<String> genresExactExclude) {
@@ -70,21 +70,17 @@ public class SortService {
             String artistId = item.getTrack().getArtists().get(0).getId();
             List<String> artistGenres = artistGenreMap.get(artistId);
             if (artistGenres == null) {
-                try {
-                    if(!artistId.isBlank() && artistId != null) {
+
+                    if(artistId != null && !artistId.isBlank() ) {
                         artistsList.add(artistId);
                     }
                     if(artistsList.size() == 50) {
                         ///////////////////////////////////////////////////////////////////////////////
 
-                        try {
+
                             artistsResponse = spotifyClient.get("https://api.spotify.com/v1/artists?ids=" + generateArtistList(artistsList),
                                     ArtistsResponse.class);
-                        }
-                        catch(Exception e) {
-                            System.out.println("ERROR");
-                            continue;
-                        }
+
                         for(Artist artist: artistsResponse.getArtists()) {
                             artistGenreMap.put(artist.getId(), artist.getGenres());
                         }
@@ -92,15 +88,13 @@ public class SortService {
                         artistsList = new HashSet<>();
                     }
 
-                } catch (Exception e) {
-                    continue;
-                }
+
             }
         }
         /////////////////////////////////////////////////////////////////////////////
         if(artistsList.size() > 0) {
             //System.out.println(generateJsonWithSingleList(artistsList, "ids"));
-            try {
+
                 artistsResponse = spotifyClient.get("https://api.spotify.com/v1/artists?ids=" + generateArtistList(artistsList),
                         ArtistsResponse.class);
 
@@ -108,16 +102,20 @@ public class SortService {
                 for (Artist artist : artistsResponse.getArtists()) {
                     artistGenreMap.put(artist.getId(), artist.getGenres());
                 }
-            }
-            catch(Exception e) {
-                System.out.println("ERROR");
-            }
+
         }
         ////////////////////////////////////////////////////////////////////////////////
         for(Item item: items) {
-            try {
+
                 boolean hasGenre = false;
+                if(item.getTrack() == null) {
+                    continue;
+                }
                 List<String> artistGenres = artistGenreMap.get(item.getTrack().getArtists().get(0).getId());
+
+                if(artistGenres == null) {
+                    continue;
+                }
 
                 if(genres != null) {
                     for (String genre : genres) {
@@ -155,10 +153,7 @@ public class SortService {
                         }
                     }
                 }
-            }
-            catch(Exception e) {
-                continue;
-            }
+
             //Wait.waitInMillis(350);
         }
     }

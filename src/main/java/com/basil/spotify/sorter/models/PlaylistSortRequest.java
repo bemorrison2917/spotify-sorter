@@ -1,18 +1,18 @@
 package com.basil.spotify.sorter.models;
 
 public class PlaylistSortRequest {
-    private String playlistIdSource;
+    private String playlistUrlSource;
     private String genres;
-    private String playlistIdDestination;
+    private String playlistUrlDestination;
     private String genresExactMatch;
     private String genresExactExclude;
 
-    public String getPlaylistIdSource() {
-        return playlistIdSource;
+    public String getPlaylistUrlSource() {
+        return playlistUrlSource;
     }
 
-    public void setPlaylistIdSource(String playlistIdSource) {
-        this.playlistIdSource = playlistIdSource;
+    public void setPlaylistUrlSource(String playlistUrlSource) {
+        this.playlistUrlSource = playlistUrlSource;
     }
 
     public String getGenres() {
@@ -23,12 +23,12 @@ public class PlaylistSortRequest {
         this.genres = genres;
     }
 
-    public String getPlaylistIdDestination() {
-        return playlistIdDestination;
+    public String getPlaylistUrlDestination() {
+        return playlistUrlDestination;
     }
 
-    public void setPlaylistIdDestination(String playlistIdDestination) {
-        this.playlistIdDestination = playlistIdDestination;
+    public void setPlaylistUrlDestination(String playlistUrlDestination) {
+        this.playlistUrlDestination = playlistUrlDestination;
     }
 
     public String getGenresExactMatch() {

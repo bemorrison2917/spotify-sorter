@@ -1,3 +1,7 @@
-<form th:action="@{/sort}" th:object="${playlistSortRequest}" method="get">
+<form th:action="@{/home}" method="get">
+    <button type="submit" id="homeButton">Home</button>
+</form>
+<form th:action="@{/artist-search}" th:object="${playlistSortRequest}" method="get">
     <input type="text" id="artistName" name="artistName" placeholder="Artist name"/>
+    <button type="submit" id="searchButton">Search</button>
 </form>

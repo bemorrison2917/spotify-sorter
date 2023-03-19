@@ -1,7 +1,10 @@
-<form th:action="@{/sort}" th:object="${playlistSortRequest}" method="get">
+<form th:action="@{/home}" method="get">
+    <button type="submit" id="homeButton">Home</button>
+</form>
+<form th:action="@{/genre-sort}" th:object="${playlistSortRequest}" method="get">
     <p>Required</p>
-    <input type="text" id="playlistIdSource" name="playlistIdSource" placeholder="Source playlist id"/>
-    <input type="text" id="playlistIdDestination" name="playlistIdDestination" placeholder="Destination playlist id"/>
+    <input type="text" id="playlistUrlSource" name="playlistUrlSource" placeholder="Source playlist url"/>
+    <input type="text" id="playlistUrlDestination" name="playlistUrlDestination" placeholder="Destination playlist url"/>
     <p>Must fill out at least one of these fields</p>
     <input type="text" id="genres" name="genres" placeholder="Comma separated genres"/>
     <input type="text" id="genresExactMatch" name="genresExactMatch" placeholder="Genres exact match"/>

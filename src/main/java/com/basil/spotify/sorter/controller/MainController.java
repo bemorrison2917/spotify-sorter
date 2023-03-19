@@ -16,12 +16,12 @@ public class MainController {
         return "home";
     }
 
-    @GetMapping(value = "/genre-sort")
+    @GetMapping(value = "/genre-sort-home")
     public String test2() {
         return "test";
     }
 
-    @GetMapping(value = "/artist-search")
+    @GetMapping(value = "/artist-search-home")
     public String test3() {
         return "artistSearch";
     }
