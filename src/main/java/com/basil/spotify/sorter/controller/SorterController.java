@@ -10,6 +10,7 @@ import java.util.*;
 
 @RestController
 public class SorterController {
+
     @Autowired
     private SpotifyClient spotifyClient;
 
